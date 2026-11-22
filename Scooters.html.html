@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Basic Store · Scooters eléctricos en Chile</title>
+<meta name="description" content="Menos taco. Más ciudad. Scooters eléctricos seleccionados con compra protegida en Mercado Libre.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F3F4F6; --surface:#FFFFFF; --ink:#0E1116; --muted:#5B6270; --line:#DDE0E5; --accent:#2F4BFF;
+  --radius:22px; --max:1120px;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0E1116;--surface:#171B22;--ink:#F3F4F6;--muted:#9AA1AE;--line:#262B34;--accent:#7C8DFF}
+}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:"Archivo",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased;padding-bottom:64px}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+section{padding:112px 0}
+h1,h2,h3{font-weight:700;letter-spacing:-.03em;line-height:1.05}
+h2{font-size:clamp(2rem,4.5vw,3.25rem);font-stretch:90%}
+.lead{color:var(--muted);font-size:1.125rem;max-width:56ch;margin-top:16px}
+
+/* Navegación */
+header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
+.logo{font-weight:800;letter-spacing:-.04em;text-decoration:none;font-size:1.1rem}
+nav a{margin-left:24px;text-decoration:none;color:var(--muted);font-size:.9rem}
+nav a:hover{color:var(--ink)}
+
+/* Hero */
+.hero{padding:clamp(72px,14vh,150px) 0 96px}
+.badge{display:inline-block;font-size:.72rem;letter-spacing:.14em;font-weight:600;color:var(--accent);border:1px solid var(--accent);padding:7px 14px;border-radius:99px}
+.hero h1{font-size:clamp(3.2rem,11vw,8.5rem);font-stretch:80%;font-weight:800;letter-spacing:-.05em;line-height:.92;margin:28px 0 24px}
+.hero p{color:var(--muted);font-size:clamp(1.05rem,2vw,1.3rem);max-width:46ch}
+.cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:36px}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:14px 26px;border-radius:99px;font:600 .95rem "Archivo",system-ui,sans-serif;text-decoration:none;cursor:pointer;border:1px solid var(--ink);transition:transform .2s,background .2s,color .2s}
+.btn.primary{background:var(--ink);color:var(--bg)}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn:hover{transform:translateY(-2px)}
+
+/* Barra de progreso ondulada */
+#wave{position:fixed;left:0;right:0;bottom:0;height:52px;z-index:30;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--line);pointer-events:none}
+#wave svg{width:100%;height:100%;display:block;overflow:visible}
+#wave .track{stroke:var(--line);fill:none;stroke-width:2}
+#wave .prog{stroke:var(--accent);fill:none;stroke-width:2.5;stroke-linecap:round}
+#wave .rider{fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#wave .rider .w{fill:var(--bg)}
+
+/* Anatomía 3D */
+.anat{display:grid;grid-template-columns:1.55fr 1fr;gap:40px;align-items:center;margin-top:48px}
+.stage{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;height:clamp(380px,52vw,600px)}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:none;outline:none}
+.stage canvas:active{cursor:grabbing}
+@media(pointer:coarse){.stage canvas{touch-action:pan-y}}
+.stage-msg{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-size:.9rem;text-align:center;padding:24px;pointer-events:none}
+.stage-ui{position:absolute;left:16px;right:16px;bottom:16px;display:flex;gap:8px;flex-wrap:wrap}
+.btn.sm{padding:10px 18px;font-size:.85rem;background:color-mix(in srgb,var(--surface) 82%,transparent);backdrop-filter:blur(8px)}
+.btn.sm[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.info{min-height:170px}
+.info h3{font-size:1.6rem;margin-bottom:10px}
+.info p{color:var(--muted)}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
+.tabs button{font:500 .85rem "Archivo",system-ui,sans-serif;background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:99px;padding:8px 14px;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.hint{color:var(--muted);font-size:.8rem;margin-top:18px;max-width:44ch}
+
+/* Catálogo */
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:36px 0 32px}
+.filters button{font:600 .9rem "Archivo",system-ui,sans-serif;background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:99px;padding:10px 20px;cursor:pointer;transition:.2s}
+.filters button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column}
+.photo{position:relative;aspect-ratio:4/3;background:var(--bg);display:grid;place-items:center}
+.photo img{width:100%;height:100%;object-fit:contain;padding:12px}
+.ph{display:grid;place-items:center;gap:6px;color:var(--muted);font-size:.8rem;text-align:center;padding:16px}
+.ph svg{width:72px;height:auto;stroke:var(--muted);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.dots{position:absolute;bottom:10px;left:0;right:0;display:flex;justify-content:center;gap:6px}
+.dots button{width:9px;height:9px;border-radius:50%;border:0;background:var(--line);cursor:pointer;padding:0}
+.dots button[aria-current="true"]{background:var(--ink)}
+.body{padding:20px;display:flex;flex-direction:column;gap:14px;flex:1}
+.gama{font-size:.8rem;color:var(--accent);font-weight:600}
+.body h3{font-size:1.2rem;letter-spacing:-.02em;line-height:1.2}
+.specs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;border-block:1px solid var(--line);padding:12px 0}
+.specs div{font-size:.72rem;color:var(--muted)}
+.specs b{display:block;color:var(--ink);font-size:.92rem;font-weight:600;line-height:1.25}
+.price{font-size:1.6rem;font-weight:700;letter-spacing:-.03em;margin-top:auto}
+.price small{font-size:.75rem;color:var(--muted);font-weight:400;margin-left:4px;letter-spacing:0}
+.actions{display:grid;gap:8px}
+.actions .btn{padding:12px 16px;font-size:.88rem}
+dialog{border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);color:var(--ink);padding:0;width:min(640px,92vw);max-height:90vh;overflow:auto}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+.dlg{padding:24px;display:grid;gap:16px}
+.dlg .photo{border-radius:14px}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap}
+.thumbs button{width:64px;height:64px;border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:2px;cursor:pointer;overflow:hidden}
+.thumbs button[aria-current="true"]{border-color:var(--ink)}
+.thumbs img{width:100%;height:100%;object-fit:cover;border-radius:8px}
+.close{justify-self:end}
+footer{border-top:1px solid var(--line);padding:40px 0;color:var(--muted);font-size:.85rem}
+
+@media(max-width:820px){
+  section{padding:80px 0}
+  .anat{grid-template-columns:1fr}
+  nav a:not(:last-child){display:none}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .btn{transition:none}
+}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a class="logo" href="#top">the basic store</a>
+    <nav><a href="#como-funciona">Cómo funciona</a><a href="#catalogo">Modelos</a></nav>
+  </div>
+</header>
+
+<main id="top">
+  <!-- 1. PORTADA -->
+  <div class="hero">
+    <div class="wrap">
+      <span class="badge">ELECTROMOVILIDAD UNIPERSONAL</span>
+      <h1>Menos taco.<br>Más ciudad.</h1>
+      <p>Muévete libre, ahorra tiempo y transforma tus trayectos diarios. Modelos seleccionados con compra protegida.</p>
+      <div class="cta">
+        <a class="btn primary" href="#catalogo">Ver modelos</a>
+        <a class="btn ghost" href="#como-funciona">Ver cómo funciona</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. ANATOMÍA 3D -->
+  <section id="como-funciona">
+    <div class="wrap">
+      <h2>Así funciona un scooter eléctrico.</h2>
+      <p class="lead">Gíralo, sepáralo pieza por pieza y toca cada parte clave para ver qué hace.</p>
+      <div class="anat">
+        <div class="stage" id="stage">
+          <canvas id="c3d" role="img" aria-label="Modelo 3D interactivo de un scooter eléctrico"></canvas>
+          <div class="stage-msg" id="stageMsg">Cargando modelo 3D…</div>
+          <div class="stage-ui">
+            <button class="btn ghost sm" id="explode" type="button" aria-pressed="false">Vista despiece / Expandir</button>
+            <button class="btn ghost sm" id="reset" type="button">Reiniciar vista</button>
+          </div>
+        </div>
+        <div>
+          <div class="info" aria-live="polite"><h3 id="pt"></h3><p id="pd"></p></div>
+          <div class="tabs" id="tabs"></div>
+          <p class="hint">Arrastra para rotar · pellizca o usa la rueda para acercar · toca una pieza para enfocarla</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+<!-- 3. CATÁLOGO -->
+  <section id="catalogo" style="padding-top:0">
+    <div class="wrap">
+      <h2>Modelos seleccionados.</h2>
+      <p class="lead">Los datos justos para decidir rápido. La compra se hace en Mercado Libre, con compra protegida.</p>
+      <div class="filters" id="filters" role="group" aria-label="Filtrar por gama"></div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    The Basic Store · thebasicstore.cl · Los precios y la disponibilidad pueden cambiar en Mercado Libre. Las especificaciones son referenciales según cada publicación.
+  </div>
+</footer>
+
+<!-- Barra de progreso ondulada -->
+<div id="wave" aria-hidden="true">
+  <svg id="waveSvg">
+    <path class="track" id="track"/>
+    <path class="prog" id="prog"/>
+    <g class="rider" id="rider">
+      <circle class="w" cx="-9" cy="-3" r="3.6"/><circle class="w" cx="9" cy="-3" r="3.6"/>
+      <path d="M-9 -3 H7 M7 -3 L5 -15 M2 -15 H9"/>
+    </g>
+  </svg>
+</div>
+
+<dialog id="dlg"></dialog>
+
+<script>
+/* =====================================================================
+   CÓMO EDITAR EL CATÁLOGO
+   - Agregar un scooter: copia un bloque { ... } completo y pégalo en SCOOTERS.
+   - Quitar un scooter: borra su bloque (o ponle `activo: false`).
+   - Más fotos: agrega rutas al arreglo `imagenes`. La primera es la portada.
+     Ej: imagenes: ["img/xiaomi-6.webp", "img/xiaomi-6-b.webp"]
+   - gama debe ser exactamente: "Urbana", "Trayecto Largo" o "Potencia / Off-Road".
+   ===================================================================== */
+const GAMAS = ["Todos", "Urbana", "Trayecto Largo", "Potencia / Off-Road"];
+
+const SCOOTERS = [
+  { nombre: "Lubabycas M2", gama: "Urbana", autonomia: "30 km", velocidad: "25 km/h", potencia: "350W (36V)", precio: "$199.990",
+    imagenes: ["img/lubabycas-m2.webp"], link: "https://meli.la/2TPRSnS" },
+  { nombre: "E9 Pro Negro (Con App)", gama: "Urbana", autonomia: "30 km", velocidad: "25 - 30 km/h", potencia: "350W (36V)", precio: "$229.990",
+    imagenes: ["img/e9-pro.webp"], link: "https://meli.la/1eKdyBR" },
+  { nombre: "E5 Max Negro (Aluminio con App)", gama: "Trayecto Largo", autonomia: "35 - 40 km", velocidad: "30 km/h", potencia: "500W (36V)", precio: "$259.990",
+    imagenes: ["img/e5-max.webp"], link: "https://meli.la/2so1X3h" },
+  { nombre: "Xiaomi Electric Scooter 6 Essential", gama: "Urbana", autonomia: "25 - 30 km", velocidad: "25 km/h", potencia: "300W - 400W máx", precio: "$299.990",
+    imagenes: ["img/xiaomi-6-essential.webp"], link: "https://meli.la/1ppkwFG" },
+  { nombre: "Segway Ninebot E2 Plus II Plegable", gama: "Trayecto Largo", autonomia: "25 km", velocidad: "25 km/h", potencia: "300W (500W máx)", extra: "Suspensión delantera", precio: "$399.990",
+    imagenes: ["img/segway-e2-plus-2.webp"], link: "https://meli.la/2W56V2M" },
+  { nombre: "Xiaomi Electric Scooter 6 Negro", gama: "Trayecto Largo", autonomia: "45 km", velocidad: "25 km/h", potencia: "400W (800W máx)", extra: "Suspensión", precio: "$449.990",
+    imagenes: ["img/xiaomi-6.webp"], link: "https://meli.la/324BP6S" },
+  { nombre: "Scooter Plegable Todo Terreno Adulto", gama: "Potencia / Off-Road", autonomia: "45 - 55 km", velocidad: "45 km/h", potencia: "800W - 1000W", extra: "Doble suspensión y ruedas off-road", precio: "$569.990",
+    imagenes: ["img/scooter-offroad.webp"], link: "https://meli.la/1VzBxm2" },
+  { nombre: "Xiaomi Electric Scooter 6 Pro", gama: "Potencia / Off-Road", autonomia: "70 km", velocidad: "25 km/h", potencia: "1000W máx", extra: "Doble suspensión", precio: "$599.990",
+    imagenes: ["img/xiaomi-6-pro.webp"], link: "https://meli.la/16ZxWR8" }
+];
+
+/* ---------- Utilidades ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const PLACEHOLDER = n => `<div class="ph"><svg viewBox="0 0 80 48"><circle cx="16" cy="36" r="8"/><circle cx="64" cy="36" r="8"/><path d="M16 36 H60 M60 36 L54 6 M48 6 H62"/></svg><span>${esc(n)}<br>Foto próximamente</span></div>`;
+
+/* Muestra una imagen; si no existe en img/, cae a un recuadro limpio */
+function setPhoto(box, src, name){
+  box.querySelectorAll("img,.ph").forEach(e => e.remove());
+  const img = new Image();
+  img.alt = name; img.loading = "lazy";
+  img.onerror = () => { img.remove(); box.insertAdjacentHTML("afterbegin", PLACEHOLDER(name)); };
+  img.src = src;
+  box.prepend(img);
+}
+
+/* ---------- Anatomía (tarjetas; el visor 3D está en el módulo al final) ---------- */
+const PARTES = {
+  bar:   ["Manubrio y pantalla LED", "Desde aquí controlas la velocidad, eliges el modo de manejo y frenas con la palanca. La pantalla te muestra velocidad y batería en tiempo real."],
+  fold:  ["Sistema de plegado rápido", "Una bisagra con palanca baja el manubrio en segundos. Lo guardas bajo el escritorio, en el maletero o lo subes al metro."],
+  bat:   ["Batería de litio integrada", "Va dentro de la plataforma y define cuántos kilómetros recorres por carga. Se carga en un enchufe de casa, sin instalaciones."],
+  motor: ["Motor brushless", "Va dentro de la rueda y entrega la tracción. Más potencia significa mejor respuesta en subidas y mayor velocidad máxima."],
+  susp:  ["Neumáticos y suspensión", "Los neumáticos con relieve dan agarre y la suspensión absorbe baches, juntas y adoquines en calles y ciclovías."]
+};
+const ORDER = ["bar", "fold", "bat", "motor", "susp"];
+const tabs = $("#tabs");
+ORDER.forEach(k => {
+  const b = document.createElement("button");
+  b.type = "button"; b.textContent = PARTES[k][0]; b.dataset.k = k;
+  b.onclick = () => window.showPart(k);
+  tabs.append(b);
+});
+/* showPart(clave) actualiza la tarjeta y enfoca el 3D; showPart(null) vuelve al estado inicial */
+window.showPart = function(k, fromScene){
+  $("#pt").textContent = k ? PARTES[k][0] : "Explora el scooter";
+  $("#pd").textContent = k ? PARTES[k][1] : "Gíralo, sepáralo con «Vista despiece» y toca una pieza para acercarte.";
+  tabs.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", b.dataset.k === k));
+  if (!fromScene && window.onPartSelect) window.onPartSelect(k);
+};
+window.showPart(null, true);
+setTimeout(() => { const m = $("#stageMsg"); if (!window.__scooter3d && m) m.textContent = "No pudimos cargar el modelo 3D. Revisa tu conexión y recarga la página."; }, 9000);
+
+/* ---------- Catálogo ---------- */
+let gamaActiva = "Todos";
+const fil = $("#filters"), grid = $("#grid");
+GAMAS.forEach(g => {
+  const b = document.createElement("button");
+  b.textContent = g; b.setAttribute("aria-pressed", g === gamaActiva);
+  b.onclick = () => { gamaActiva = g; fil.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b)); render(); };
+  fil.append(b);
+});
+
+function gallery(box, s){
+  let idx = 0;
+  setPhoto(box, s.imagenes[0], s.nombre);
+  if (s.imagenes.length > 1){
+    const d = document.createElement("div"); d.className = "dots";
+    s.imagenes.forEach((src, k) => {
+      const b = document.createElement("button");
+      b.setAttribute("aria-label", "Foto " + (k + 1));
+      b.setAttribute("aria-current", k === 0);
+      b.onclick = () => { idx = k; setPhoto(box, src, s.nombre); d.querySelectorAll("button").forEach((x, j) => x.setAttribute("aria-current", j === k)); };
+      d.append(b);
+    });
+    box.append(d);
+  }
+}
+
+function render(){
+  grid.innerHTML = "";
+  SCOOTERS.filter(s => s.activo !== false && (gamaActiva === "Todos" || s.gama === gamaActiva)).forEach(s => {
+    const c = document.createElement("article");
+    c.className = "card";
+    c.innerHTML = `
+      <div class="photo"></div>
+      <div class="body">
+        <span class="gama">${esc(s.gama)}</span>
+        <h3>${esc(s.nombre)}</h3>
+        <div class="specs">
+          <div>Autonomía<b>${esc(s.autonomia)}</b></div>
+          <div>Vel. máx<b>${esc(s.velocidad)}</b></div>
+          <div>Potencia<b>${esc(s.potencia)}</b></div>
+        </div>
+        <div class="price">${esc(s.precio)}<small>CLP</small></div>
+        <div class="actions">
+          <a class="btn primary" href="${esc(s.link)}" target="_blank" rel="noopener noreferrer">Comprar en Mercado Libre</a>
+          <button class="btn ghost" type="button">Ver más fotos / detalles</button>
+        </div>
+      </div>`;
+    gallery($(".photo", c), s);
+    $(".btn.ghost", c).onclick = () => openDetails(s);
+    grid.append(c);
+  });
+}
+
+const dlg = $("#dlg");
+function openDetails(s){
+  dlg.innerHTML = `<div class="dlg">
+    <button class="btn ghost close" type="button" style="padding:8px 16px">Cerrar</button>
+    <div class="photo"></div>
+    <div class="thumbs"></div>
+    <span class="gama">${esc(s.gama)}</span>
+    <h3 style="font-size:1.5rem">${esc(s.nombre)}</h3>
+    <div class="specs">
+      <div>Autonomía<b>${esc(s.autonomia)}</b></div>
+      <div>Vel. máx<b>${esc(s.velocidad)}</b></div>
+      <div>Potencia<b>${esc(s.potencia)}</b></div>
+    </div>
+    ${s.extra ? `<p style="color:var(--muted)">Incluye: ${esc(s.extra)}.</p>` : ""}
+    <div class="price">${esc(s.precio)}<small>CLP</small></div>
+    <a class="btn primary" href="${esc(s.link)}" target="_blank" rel="noopener noreferrer">Comprar en Mercado Libre</a>
+  </div>`;
+  const box = $(".photo", dlg), th = $(".thumbs", dlg);
+  setPhoto(box, s.imagenes[0], s.nombre);
+  if (s.imagenes.length > 1) s.imagenes.forEach((src, k) => {
+    const b = document.createElement("button");
+    b.setAttribute("aria-label", "Foto " + (k + 1)); b.setAttribute("aria-current", k === 0);
+    const i = new Image(); i.src = src; i.alt = ""; i.onerror = () => i.remove(); b.append(i);
+    b.onclick = () => { setPhoto(box, src, s.nombre); th.querySelectorAll("button").forEach((x, j) => x.setAttribute("aria-current", j === k)); };
+    th.append(b);
+  });
+  $(".close", dlg).onclick = () => dlg.close();
+  dlg.showModal();
+}
+dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
+render();
+
+/* ---------- Barra ondulada con scooter ---------- */
+const svg = $("#waveSvg"), track = $("#track"), prog = $("#prog"), rider = $("#rider");
+let len = 0;
+function buildWave(){
+  const w = innerWidth, h = 52, mid = 28, amp = 7, step = Math.max(60, w / 14);
+  let d = `M0 ${mid}`;
+  for (let x = 0, up = true; x < w + step; x += step, up = !up)
+    d += ` Q${x + step / 2} ${mid + (up ? -amp * 2 : amp * 2)} ${x + step} ${mid}`;
+  svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+  track.setAttribute("d", d); prog.setAttribute("d", d);
+  len = track.getTotalLength();
+  prog.style.strokeDasharray = len;
+  update();
+}
+function update(){
+  const max = document.documentElement.scrollHeight - innerHeight;
+  const p = max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0;
+  const pad = 26, usable = innerWidth - pad * 2;
+  const L = (pad + p * usable) / (innerWidth + 1) * len;
+  prog.style.strokeDashoffset = len - L;
+  const a = track.getPointAtLength(Math.max(0, L - 4)), b = track.getPointAtLength(Math.min(len, L + 4));
+  const ang = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
+  const pt = track.getPointAtLength(L);
+  rider.setAttribute("transform", `translate(${pt.x} ${pt.y - 4}) rotate(${ang})`);
+}
+addEventListener("scroll", () => requestAnimationFrame(update), { passive: true });
+addEventListener("resize", buildWave);
+buildWave();
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+window.__scooter3d = true;
+const $id = id => document.getElementById(id);
+const stage = $id('stage'), cv = $id('c3d'), msg = $id('stageMsg'), btnX = $id('explode'), btnR = $id('reset');
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const coarse = matchMedia('(pointer:coarse)').matches;
+const V = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z), Y = V(0, 1, 0), HALF = Math.PI / 2;
+const ease = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+
+/* Vista de cámara por pieza: dir = ángulo de mirada, dist = distancia, auto = abre el despiece */
+const PARTS = {
+  bar:   { focus: ['bar'],           dir: [-.55, .3, .9], dist: 1.0 },
+  fold:  { focus: ['fold'],          dir: [.4, .15, 1],   dist: .95 },
+  bat:   { focus: ['bat'],           dir: [.35, .6, 1],   dist: 1.5, auto: 1 },
+  motor: { focus: ['motor'],         dir: [-.5, .3, 1],   dist: 1.0, auto: 1 },
+  susp:  { focus: ['fork', 'tireF'], dir: [.9, .2, 1],    dist: 1.3 }
+};
+const KEYS = Object.keys(PARTS), hl = {};
+KEYS.forEach(k => hl[k] = 0);
+const G = {}, SETS = {};
+let renderer, scene, camera, controls, root, sel = null, eT = 0, e = 0, tw = null, raf = 0, last = 0, ready = false, visible = false;
+
+/* ---------- Construcción del modelo ---------- */
+function screenTex(){
+  const c = document.createElement('canvas'); c.width = 256; c.height = 64;
+  const x = c.getContext('2d');
+  x.fillStyle = '#05070b'; x.fillRect(0, 0, 256, 64);
+  x.fillStyle = '#aab6ff'; x.font = '700 46px Archivo, system-ui, sans-serif'; x.textBaseline = 'middle'; x.fillText('19', 14, 34);
+  x.fillStyle = '#6b7390'; x.font = '600 14px system-ui, sans-serif'; x.fillText('km/h', 70, 44);
+  x.fillStyle = '#aab6ff'; x.fillText('ECO', 208, 14);
+  for (let i = 0; i < 5; i++){ x.fillStyle = i < 4 ? '#7C8DFF' : '#262B34'; x.fillRect(138 + i * 14, 24, 10, 26); }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+function glowTex(){
+  const c = document.createElement('canvas'); c.width = c.height = 64;
+  const x = c.getContext('2d'), g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+  g.addColorStop(0, 'rgba(255,255,255,.95)'); g.addColorStop(.35, 'rgba(190,205,255,.35)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+  x.fillStyle = g; x.fillRect(0, 0, 64, 64);
+  return new THREE.CanvasTexture(c);
+}
+
+function build(){
+  const th = .12, B = V(.455, .42, 0), D = V(-Math.sin(th), Math.cos(th), 0), RW = .147;
+  const sp = s => B.clone().addScaledVector(D, s);
+  const hubF = sp(-(B.y - RW) / D.y), hubR = V(-.5, RW, 0);
+  const mat = (c, me, ro) => new THREE.MeshStandardMaterial({ color: c, metalness: me, roughness: ro, envMapIntensity: .9 });
+  [...KEYS, 'x'].forEach(k => {
+    SETS[k] = { alu: mat(0x2b303a, .85, .42), blk: mat(0x111317, .3, .5), met: mat(0xc4cad4, 1, .28), rub: mat(0x0c0d10, 0, .9), acc: mat(0x2F4BFF, .3, .4) };
+  });
+  SETS.motor.cu = mat(0xc4793a, .9, .35);
+  Object.values(SETS).forEach(s => Object.values(s).forEach(m => m.emissive.set(0x2F4BFF)));
+
+  const grp = (n, p, off) => { const g = new THREE.Group(); g.userData.part = p; root.add(g); return G[n] = { g, off, set: SETS[p || 'x'], home: V() }; };
+  const add = (o, geo, m, p = V(), r = [0, 0, 0]) => { const x = new THREE.Mesh(geo, m); x.position.copy(p); x.rotation.set(r[0], r[1], r[2]); x.castShadow = x.receiveShadow = true; o.g.add(x); return x; };
+  const tube = (o, a, b, r, m) => {
+    const d = b.clone().sub(a), len = d.length();
+    const x = new THREE.Mesh(new THREE.CylinderGeometry(r, r, len, 18), m);
+    x.position.copy(a).addScaledVector(d, .5); x.quaternion.setFromUnitVectors(Y, d.normalize());
+    x.castShadow = x.receiveShadow = true; o.g.add(x); return x;
+  };
+  const RB = (w, h, d, r = .01) => new RoundedBoxGeometry(w, h, d, 3, r);
+  const cyl = (r, l, seg = 28) => new THREE.CylinderGeometry(r, r, l, seg);
+  const cable = (o, s0, s1) => {
+    const pts = [];
+    for (let i = 0; i <= 14; i++){ const p = sp(s0 + (s1 - s0) * i / 14); p.x -= Math.cos(th) * .032; p.y -= Math.sin(th) * .032; p.z = Math.sin(i * 1.3) * .007; pts.push(p); }
+    const x = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 28, .0042, 6), o.set.blk);
+    x.castShadow = true; o.g.add(x);
+  };
+  const helix = (o, pos, len, r, turns, tr, m) => {
+    const pts = [], n = turns * 10;
+    for (let i = 0; i <= n; i++){ const t = i / n, a = t * turns * Math.PI * 2; pts.push(V(Math.cos(a) * r, -t * len, Math.sin(a) * r)); }
+    const x = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), n * 2, tr, 6), m);
+    x.position.copy(pos); x.rotation.z = th; x.castShadow = true; o.g.add(x);
+  };
+  /* Rueda: neumático con relieve, llanta de aluminio, radios y buje */
+  const wheel = (o, c) => {
+    const s = o.set;
+    add(o, new THREE.TorusGeometry(.098, .044, 18, 56), s.rub, c).scale.z = 1.25;
+    const N = 44, tr = new THREE.InstancedMesh(new THREE.BoxGeometry(.012, .03, .07), s.rub, N), d = new THREE.Object3D();
+    for (let i = 0; i < N; i++){ const a = i / N * Math.PI * 2; d.position.set(c.x + Math.cos(a) * .141, c.y + Math.sin(a) * .141, c.z); d.rotation.set(0, 0, a); d.updateMatrix(); tr.setMatrixAt(i, d.matrix); }
+    tr.castShadow = true; o.g.add(tr);
+    add(o, new THREE.TorusGeometry(.082, .013, 10, 40), s.met, c).scale.z = 2.4;
+    for (let i = 0; i < 5; i++){ const a = i * Math.PI * 2 / 5 + .3; add(o, new THREE.BoxGeometry(.075, .022, .012), s.alu, V(c.x + Math.cos(a) * .045, c.y + Math.sin(a) * .045, c.z), [0, 0, a]); }
+    add(o, cyl(.022, .1, 20), s.met, c, [HALF, 0, 0]);
+  };
+
+  /* Ruedas */
+  let o = grp('tireR', 'susp', V(-.42, 0, 0)); wheel(o, hubR);
+  o = grp('tireF', 'susp', V(.34, 0, 0)); wheel(o, hubF);
+
+  /* Motor brushless en el buje trasero */
+  o = grp('motor', 'motor', V(-.12, .5, .32));
+  let s = o.set;
+  add(o, cyl(.068, .092), s.alu, hubR, [HALF, 0, 0]);
+  add(o, cyl(.074, .012), s.blk, hubR.clone().add(V(0, 0, .05)), [HALF, 0, 0]);
+  add(o, cyl(.06, .02), s.blk, hubR.clone().add(V(0, 0, -.056)), [HALF, 0, 0]);
+  const cu = new THREE.InstancedMesh(new THREE.BoxGeometry(.024, .016, .03), s.cu, 16), dm = new THREE.Object3D();
+  for (let i = 0; i < 16; i++){ const a = i / 16 * Math.PI * 2; dm.position.set(hubR.x + Math.cos(a) * .052, hubR.y + Math.sin(a) * .052, hubR.z - .066); dm.rotation.set(0, 0, a); dm.updateMatrix(); cu.setMatrixAt(i, dm.matrix); }
+  cu.castShadow = true; o.g.add(cu);
+  add(o, cyl(.012, .15, 16), s.met, hubR, [HALF, 0, 0]);
+
+  /* Batería: bandeja de aluminio con celdas */
+  o = grp('bat', 'bat', V(0, -.03, 0)); s = o.set;
+  add(o, RB(.58, .02, .17, .006), s.alu, V(-.05, .1075, 0));
+  [-1, 1].forEach(g => add(o, RB(.58, .046, .012, .004), s.alu, V(-.05, .14, g * .079)));
+  [-1, 1].forEach(g => add(o, RB(.012, .046, .17, .004), s.alu, V(-.05 + g * .284, .14, 0)));
+  [-.045, 0, .045].forEach(z => {
+    add(o, cyl(.02, .54, 20), s.acc, V(-.05, .1385, z), [0, 0, HALF]);
+    [-1, 1].forEach(g => add(o, cyl(.012, .01, 16), s.met, V(-.05 + g * .272, .1385, z), [0, 0, HALF]));
+  });
+
+  /* Plataforma antideslizante + base de la dirección + brazos traseros + luz LED lateral */
+  o = grp('deck', null, V(0, .3, 0)); s = o.set;
+  add(o, RB(.76, .045, .2, .02), s.alu, V(-.04, .185, 0));
+  add(o, RB(.62, .008, .165, .004), s.rub, V(-.04, .2095, 0));
+  const rg = new THREE.InstancedMesh(new THREE.BoxGeometry(.012, .005, .15), s.rub, 22), dr = new THREE.Object3D();
+  for (let i = 0; i < 22; i++){ dr.position.set(-.04 + (i - 10.5) * .026, .2155, 0); dr.updateMatrix(); rg.setMatrixAt(i, dr.matrix); }
+  rg.castShadow = true; o.g.add(rg);
+  [-1, 1].forEach(g => tube(o, V(-.4, .19, g * .07), V(-.5, RW, g * .07), .012, s.alu));
+  const led = new THREE.MeshStandardMaterial({ color: 0x2F4BFF, emissive: 0x4d63ff, emissiveIntensity: 2.2 });
+  [-1, 1].forEach(g => add(o, RB(.6, .007, .007, .003), led, V(-.04, .16, g * .099)));
+
+  /* Guardabarros trasero + luz de freno */
+  o = grp('fenderR', null, V(-.22, .32, 0)); s = o.set;
+  const fm = new THREE.MeshStandardMaterial({ color: 0x2b303a, metalness: .85, roughness: .42, side: THREE.DoubleSide, envMapIntensity: .9 });
+  add(o, new THREE.CylinderGeometry(.17, .17, .095, 36, 1, true, Math.PI - 1.1, 2.2), fm, hubR, [HALF, 0, 0]);
+  add(o, RB(.02, .012, .05, .004), new THREE.MeshStandardMaterial({ color: 0xff2a2a, emissive: 0xff1f1f, emissiveIntensity: 2.5 }), V(-.651, .224, 0));
+
+  /* Dirección: base de mástil + cuello hacia la plataforma */
+  o = grp('stageLow', null, D.clone().multiplyScalar(.06)); s = o.set;
+  tube(o, B, sp(.27), .024, s.alu);
+  tube(o, sp(-.015), sp(.035), .032, s.blk);
+  tube(o, V(.33, .205, 0), V(.44, .375, 0), .03, s.alu);
+  cable(o, 0, .26);
+
+  /* Horquilla con suspensión delantera */
+  o = grp('fork', 'susp', V(.16, 0, 0)); s = o.set;
+  const cc = sp(-.03);
+  add(o, RB(.05, .03, .2, .012), s.alu, cc, [0, 0, th]);
+  [-1, 1].forEach(g => {
+    tube(o, V(cc.x, cc.y - .01, g * .075), V(hubF.x, hubF.y, g * .075), .011, s.met);
+    const top = V(cc.x, cc.y - .005, g * .075);
+    tube(o, top, top.clone().addScaledVector(D, -.09), .017, s.blk);
+    helix(o, top, .085, .026, 7, .0035, s.met);
+    add(o, cyl(.016, .02, 18), s.met, V(hubF.x, hubF.y, g * .085), [HALF, 0, 0]);
+  });
+
+  /* Sistema de plegado: bisagra, eje, palanca y collares */
+  o = grp('fold', 'fold', D.clone().multiplyScalar(.22)); s = o.set;
+  const hc = sp(.315);
+  add(o, RB(.065, .1, .07, .015), s.alu, hc, [0, 0, th]);
+  add(o, cyl(.014, .095, 20), s.met, hc, [HALF, 0, 0]);
+  tube(o, hc.clone().add(V(0, 0, .05)), hc.clone().add(V(.07, .06, .05)), .01, s.acc);
+  add(o, new THREE.SphereGeometry(.017, 16, 12), s.acc, hc.clone().add(V(.075, .065, .05)));
+  tube(o, sp(.26), sp(.275), .03, s.blk);
+  tube(o, sp(.355), sp(.37), .03, s.blk);
+  cable(o, .26, .37);
+
+  /* Mástil superior */
+  o = grp('stemUp', null, D.clone().multiplyScalar(.4)); s = o.set;
+  tube(o, sp(.37), sp(.74), .021, s.alu);
+  cable(o, .37, .74);
+
+  /* Manubrio: puños, palanca de freno, acelerador, pantalla y luz frontal */
+  o = grp('bar', 'bar', D.clone().multiplyScalar(.52)); s = o.set;
+  const T = sp(.74), hy = T.y + .03;
+  tube(o, T.clone().addScaledVector(D, -.02), T.clone().addScaledVector(D, .035), .03, s.blk);
+  tube(o, V(T.x, hy, -.18), V(T.x, hy, .18), .0115, s.alu);
+  [-1, 1].forEach(g => {
+    tube(o, V(T.x, hy, g * .18), V(T.x - .025, hy, g * .23), .0115, s.alu);
+    tube(o, V(T.x - .025, hy, g * .225), V(T.x - .025, hy, g * .33), .0185, s.rub);
+    tube(o, V(T.x - .025, hy, g * .33), V(T.x - .025, hy, g * .338), .013, s.met);
+  });
+  add(o, RB(.032, .03, .034, .008), s.blk, V(T.x - .022, hy - .012, .245));
+  tube(o, V(T.x - .015, hy - .02, .245), V(T.x + .085, hy - .05, .24), .0062, s.met);
+  add(o, RB(.034, .016, .05, .007), s.acc, V(T.x - .03, hy + .022, -.235));
+  const dx = T.x - .002, dy = hy + .05;
+  tube(o, V(dx, hy, 0), V(dx, dy, 0), .012, s.blk);
+  add(o, RB(.05, .032, .118, .01), s.blk, V(dx, dy, 0));
+  const scr = new THREE.Mesh(new THREE.PlaneGeometry(.1, .025), new THREE.MeshBasicMaterial({ map: screenTex(), toneMapped: false }));
+  scr.position.set(dx - .0255, dy, 0); scr.rotation.y = -HALF; o.g.add(scr);
+  const hx = T.x + .05;
+  add(o, cyl(.027, .038), s.blk, V(hx, T.y, 0), [0, 0, HALF]);
+  add(o, cyl(.02, .006), new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 3 }), V(hx + .02, T.y, 0), [0, 0, HALF]);
+  const gl = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex(), blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: .7 }));
+  gl.position.set(hx + .05, T.y, 0); gl.scale.set(.2, .2, 1); o.g.add(gl);
+
+  root.updateMatrixWorld(true);
+  Object.values(G).forEach(q => new THREE.Box3().setFromObject(q.g).getCenter(q.home));
+}
+
+/* ---------- Cámara y estados ---------- */
+const fit = d => { const a = camera.aspect; return a < 1.25 ? d * Math.pow(1.25 / a, .75) : d; };
+const ov = b => ({ p: V(.8, .28, 1).normalize().multiplyScalar(fit(b ? 3.9 : 3.0)).add(V(0, b ? .7 : .6, 0)), t: V(0, b ? .7 : .6, 0) });
+function flyTo(p, t){ tw = { p0: camera.position.clone(), t0: controls.target.clone(), p1: p, t1: t, t: 0, dur: reduce ? .01 : 1.1 }; }
+function setExplode(b, quiet){
+  eT = b ? 1 : 0;
+  btnX.setAttribute('aria-pressed', b); btnX.textContent = b ? 'Contraer vista' : 'Vista despiece / Expandir';
+  if (!quiet){ if (sel) focusPart(sel, true); else { const v = ov(b); flyTo(v.p, v.t); } }
+}
+function focusPart(k, noAuto){
+  const P = PARTS[k]; sel = k; controls.autoRotate = false;
+  if (P.auto && !noAuto) setExplode(true, true);
+  const c = V();
+  P.focus.forEach(n => c.add(G[n].home.clone().addScaledVector(G[n].off, eT)));
+  c.divideScalar(P.focus.length);
+  flyTo(c.clone().add(V(...P.dir).normalize().multiplyScalar(fit(P.dist))), c);
+}
+function resetView(){
+  sel = null; setExplode(false, true); const v = ov(false); flyTo(v.p, v.t);
+  controls.autoRotate = !reduce; window.showPart(null, true);
+}
+window.onPartSelect = k => { if (!ready) return; k ? focusPart(k) : resetView(); };
+
+/* ---------- Inicio y render ---------- */
+function init(){
+  try { renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true, powerPreference: 'high-performance' }); }
+  catch (err){ msg.textContent = 'Tu navegador no pudo iniciar el visor 3D.'; return; }
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, coarse ? 1.5 : 2));
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+  scene = new THREE.Scene();
+  scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), .04).texture;
+  camera = new THREE.PerspectiveCamera(35, 1, .1, 30);
+
+  /* Iluminación de estudio: ambiente suave + luz principal con sombras + relleno frío + contraluz */
+  scene.add(new THREE.AmbientLight(0xffffff, .35), new THREE.HemisphereLight(0xffffff, 0x8a93a3, .45));
+  const key = new THREE.DirectionalLight(0xffffff, 2.3); key.position.set(2.2, 3.6, 2.4); key.castShadow = true;
+  key.shadow.mapSize.set(1024, 1024); key.shadow.bias = -.0004; key.shadow.radius = 4;
+  Object.assign(key.shadow.camera, { left: -1.8, right: 1.8, top: 1.8, bottom: -1.8, near: .5, far: 9 });
+  const fill = new THREE.DirectionalLight(0xb8c6ff, .7); fill.position.set(-3, 1.6, -1);
+  const rim = new THREE.DirectionalLight(0xffffff, .9); rim.position.set(-1.5, 2.2, -3);
+  scene.add(key, fill, rim);
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(14, 14), new THREE.ShadowMaterial({ opacity: .3 }));
+  ground.rotation.x = -HALF; ground.receiveShadow = true; scene.add(ground);
+
+  root = new THREE.Group(); scene.add(root); build();
+
+  controls = new OrbitControls(camera, cv);
+  Object.assign(controls, { enableDamping: true, dampingFactor: .07, enablePan: false, minDistance: .5, maxDistance: 6, maxPolarAngle: HALF - .03, autoRotate: !reduce, autoRotateSpeed: .8 });
+  controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN };
+  controls.addEventListener('start', () => { tw = null; controls.autoRotate = false; });
+
+  const size = () => { const w = stage.clientWidth, h = stage.clientHeight; if (!w || !h) return; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); };
+  new ResizeObserver(size).observe(stage); size();
+  const v = ov(false); camera.position.copy(v.p); controls.target.copy(v.t); controls.update();
+
+  /* Clic / toque sobre una pieza clave */
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+  const pick = ev => {
+    const r = cv.getBoundingClientRect();
+    ndc.set((ev.clientX - r.left) / r.width * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
+    ray.setFromCamera(ndc, camera);
+    const hit = ray.intersectObjects(root.children, true)[0]; if (!hit) return null;
+    let q = hit.object; while (q && !('part' in q.userData)) q = q.parent;
+    return q ? q.userData.part : null;
+  };
+  let down = null, hov = 0;
+  cv.addEventListener('pointerdown', ev => { down = { x: ev.clientX, y: ev.clientY, t: performance.now() }; });
+  cv.addEventListener('pointerup', ev => {
+    if (!down) return;
+    const mv = Math.hypot(ev.clientX - down.x, ev.clientY - down.y), dt = performance.now() - down.t; down = null;
+    if (mv > 6 || dt > 600) return;
+    const k = pick(ev); if (k){ window.showPart(k, true); focusPart(k); }
+  });
+  cv.addEventListener('pointermove', ev => {
+    if (ev.pointerType !== 'mouse' || ev.buttons || performance.now() - hov < 70) return;
+    hov = performance.now(); cv.style.cursor = pick(ev) ? 'pointer' : 'grab';
+  });
+  btnX.addEventListener('click', () => setExplode(eT === 0));
+  btnR.addEventListener('click', resetView);
+
+  msg.style.display = 'none'; ready = true; loop();
+}
+
+function frame(now){
+  raf = requestAnimationFrame(frame);
+  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  e += (eT - e) * (1 - Math.exp(-dt * 4.5));
+  for (const n in G) G[n].g.position.copy(G[n].off).multiplyScalar(e);
+  if (tw){
+    tw.t = Math.min(1, tw.t + dt / tw.dur); const k = ease(tw.t);
+    camera.position.lerpVectors(tw.p0, tw.p1, k); controls.target.lerpVectors(tw.t0, tw.t1, k);
+    if (tw.t >= 1) tw = null;
+  }
+  KEYS.forEach(k => {
+    hl[k] += ((sel === k ? 1 : 0) - hl[k]) * (1 - Math.exp(-dt * 6));
+    const v = hl[k] * (.32 + .08 * Math.sin(now / 380));
+    for (const m of Object.values(SETS[k])) m.emissiveIntensity = v;
+  });
+  controls.update(); renderer.render(scene, camera);
+}
+function loop(){
+  const run = ready && visible && !document.hidden;
+  if (run && !raf){ last = performance.now(); raf = requestAnimationFrame(frame); }
+  else if (!run && raf){ cancelAnimationFrame(raf); raf = 0; }
+}
+new IntersectionObserver(([en]) => { visible = en.isIntersecting; if (visible && !ready && !window.__no3d){ init(); if (!ready) window.__no3d = true; } loop(); }, { rootMargin: '200px' }).observe(stage);
+document.addEventListener('visibilitychange', loop);
+</script>
+</body>
+</html>
